@@ -1,6 +1,6 @@
-[submodule "buildscripts"]
-	path = buildscripts
-	url = https://github.com/MonoGame/MonoGame.Library.BuildScripts.git
 [submodule "basis_universal"]
 	path = basis_universal
 	url = https://github.com/BinomialLLC/basis_universal.git
+[submodule "buildscripts"]
+	path = buildscripts
+	url = https://github.com/MonoGame/MonoGame.Tool.BuildScripts.git
