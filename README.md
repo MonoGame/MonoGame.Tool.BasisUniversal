@@ -21,17 +21,19 @@ produced.
 The values for `-format_only` are the numerical values for the [transcoder_texture_format]( https://github.com/BinomialLLC/basis_universal/blob/ad9386a4a1cf2a248f7bbd45f543a7448db15267/transcoder/basisu_transcoder.h#L49). For example ATC with an Alpha channel maps to [cTFATC_RGBA](https://github.com/BinomialLLC/basis_universal/blob/ad9386a4a1cf2a248f7bbd45f543a7448db15267/transcoder/basisu_transcoder.h#L73C3-L73C14) which has a numerical value of `12`.
 
 ```dotnetcli
-basisu -unpack foo.ktx2 -no_ktx -linear -format_only 2
+basisu -unpack foo.ktx2 -ktx_only -linear -format_only 2
 ```
 
-The output file(s) are listed in the output. There may be many output files. They will be stored in a .png files, but the internal image data will be compressed. We can use libraries like StbImageSharp to read the .png data.
+The output file(s) are listed in the output. There may be many output files. They will be stored in a .ktx files, but the internal image data will be compressed. We can use libraries like `libktxsharp` to read the .ktx data.
 
 ```csharp
-using (var fs = File.OpenRead(filename))
-{
-    ImageResult result = ImageResult.FromStream(fs, StbImageSharp.ColorComponents.Default);
-    return result.Data;
-}
-```
+byte[] ktxBytes = File.ReadAllBytes("myImage.ktx");
 
-If mipmap's are enabled, you will get one .png per mipmap level.
+KtxStructure ktxStructure = null;
+using (MemoryStream ms = new MemoryStream(ktxBytes))
+{
+	ktxStructure = KtxLoader.LoadInput(ms);
+}
+
+Console.WriteLine(ktxStructure.header.pixelWidth);
+```
