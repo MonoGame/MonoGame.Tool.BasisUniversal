@@ -18,7 +18,7 @@ Once you have the "basis" file you can then transform that into specific formats
 by using the `-unpack` command. Providing the `-format_only` flag will produce
 ONLY that format. Omitting this flag will result in ALL supported formats being
 produced.
-The values for `-format_only` are the numerical values for the [transcoder_texture_format]( https://github.com/BinomialLLC/basis_universal/blob/ad9386a4a1cf2a248f7bbd45f543a7448db15267/transcoder/basisu_transcoder.h#L49). For example ATC with an Alpha channel maps to [cTFATC_RGBA](https://github.com/BinomialLLC/basis_universal/blob/ad9386a4a1cf2a248f7bbd45f543a7448db15267/transcoder/basisu_transcoder.h#L73C3-L73C14) which has a numerical value of `17`.
+The values for `-format_only` are the numerical values for the [transcoder_texture_format]( https://github.com/BinomialLLC/basis_universal/blob/ad9386a4a1cf2a248f7bbd45f543a7448db15267/transcoder/basisu_transcoder.h#L49). For example ATC with an Alpha channel maps to [cTFATC_RGBA](https://github.com/BinomialLLC/basis_universal/blob/ad9386a4a1cf2a248f7bbd45f543a7448db15267/transcoder/basisu_transcoder.h#L73C3-L73C14) which has a numerical value of `12`.
 
 ```dotnetcli
 basisu -unpack foo.ktx2 -no_ktx -linear -format_only 2
