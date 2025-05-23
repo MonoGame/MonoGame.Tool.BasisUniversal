@@ -17,7 +17,7 @@ public sealed class BuildWindowsTask : FrostingTask<BuildContext>
         context.StartProcess("cmake", new ProcessSettings { WorkingDirectory = buildWorkingDir, Arguments = "-DSAN=ON CMakeLists.txt" });
         context.ReplaceTextInFiles("basis_universal/basisu.vcxproj", "MultiThreadedDLL", "MultiThreaded");
         context.StartProcess("cmake", new ProcessSettings { WorkingDirectory = buildWorkingDir, Arguments = "--build . --config release" });
-        var files = Directory.GetFiles(System.IO.Path.Combine(buildWorkingDir, "bin"), "basisu.exe", SearchOption.TopDirectoryOnly);
+        var files = Directory.GetFiles(System.IO.Path.Combine(buildWorkingDir, "bin", "Release"), "basisu.exe", SearchOption.TopDirectoryOnly);
         context.CopyFile(files[0], $"{context.ArtifactsDir}/basisu.exe");
     }
 }
