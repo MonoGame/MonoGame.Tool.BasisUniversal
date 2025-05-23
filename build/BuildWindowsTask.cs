@@ -18,7 +18,7 @@ public sealed class BuildWindowsTask : FrostingTask<BuildContext>
         var runtimeLibLine = "<PreprocessorDefinitions>NDEBUG;_HAS_EXCEPTIONS=0;%(PreprocessorDefinitions);BASISU_SUPPORT_SSE=1;BASISU_SUPPORT_OPENCL=1;</PreprocessorDefinitions>";
         context.ReplaceTextInFiles("basis_universal/basisu.vcxproj", runtimeLibLine, $"{runtimeLibLine}\n<RuntimeLibrary>MultiThreaded</RuntimeLibrary>");
         context.StartProcess("cmake", new ProcessSettings { WorkingDirectory = buildWorkingDir, Arguments = "--build . --config release" });
-        var files = Directory.GetFiles(System.IO.Path.Combine(buildWorkingDir, "bin", "Release"), "basisu.exe", SearchOption.TopDirectoryOnly);
+        var files = Directory.GetFiles(System.IO.Path.Combine(buildWorkingDir, "bin"), "basisu.exe", SearchOption.TopDirectoryOnly);
         context.CopyFile(files[0], $"{context.ArtifactsDir}/basisu.exe");
     }
 }
