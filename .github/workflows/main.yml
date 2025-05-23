@@ -56,7 +56,7 @@ jobs:
       #  run: mv ./basis_universal/LICENSE ./basis_universal/LICENSE          
 
       - name: Run CAKE
-        run: dotnet run --project ./build/Build.csproj -- --target=Package --universalBinary=true --toolname=basisu --executablename=basisu --commandname=mgcb-basisu --licensepath=basis_universal/LICENSE
+        run: dotnet run --project ./build/Build.csproj -- --target=Package --universalBinary=true --toolname=basisu --executablename=basisu --licensepath=basis_universal/LICENSE
         env:
           ACTIONS_RUNTIME_TOKEN: ${{ env.ACTIONS_RUNTIME_TOKEN }}
           ACTIONS_RUNTIME_URL: "${{ env.ACTIONS_RUNTIME_URL }}"
