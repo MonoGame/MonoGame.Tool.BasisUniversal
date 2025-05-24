@@ -13,11 +13,9 @@ public sealed class BuildWindowsTask : FrostingTask<BuildContext>
 
         // needed until https://github.com/BinomialLLC/basis_universal/pull/391 gets merged
         context.ReplaceTextInFiles("basis_universal/CMakeLists.txt", "project(basisu)", "project(basisu C CXX)\nset(CMAKE_CXX_STANDARD 17)");
-        context.ReplaceTextInFiles("basis_universal/CMakeLists.txt", "option(STATIC \"static linking\" FALSE)", "option(STATIC \"static linking\" TRUE)");
 
-        context.StartProcess("cmake", new ProcessSettings { WorkingDirectory = buildWorkingDir, Arguments = "-DSAN=ON CMakeLists.txt" });
-        var runtimeLibLine = "<PreprocessorDefinitions>NDEBUG;_HAS_EXCEPTIONS=0;%(PreprocessorDefinitions);BASISU_SUPPORT_SSE=1;BASISU_SUPPORT_OPENCL=1;</PreprocessorDefinitions>";
-        context.ReplaceTextInFiles("basis_universal/basisu.vcxproj", runtimeLibLine, $"{runtimeLibLine}\n<RuntimeLibrary>MultiThreaded</RuntimeLibrary>");
+        context.StartProcess("cmake", new ProcessSettings { WorkingDirectory = buildWorkingDir, Arguments = "-DSAN=ON -DSTATIC=TRUE CMakeLists.txt" });
+        context.ReplaceTextInFiles("basis_universal/basisu.vcxproj", "MultiThreadedDLL", "MultiThreaded");
         context.StartProcess("cmake", new ProcessSettings { WorkingDirectory = buildWorkingDir, Arguments = "--build . --config release" });
         var files = Directory.GetFiles(System.IO.Path.Combine(buildWorkingDir, "bin"), "basisu.exe", SearchOption.TopDirectoryOnly);
         context.CopyFile(files[0], $"{context.ArtifactsDir}/basisu.exe");
