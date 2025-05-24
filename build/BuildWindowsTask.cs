@@ -13,6 +13,7 @@ public sealed class BuildWindowsTask : FrostingTask<BuildContext>
 
         // needed until https://github.com/BinomialLLC/basis_universal/pull/391 gets merged
         context.ReplaceTextInFiles("basis_universal/CMakeLists.txt", "project(basisu)", "project(basisu C CXX)\nset(CMAKE_CXX_STANDARD 17)");
+        context.ReplaceTextInFiles("basis_universal/CMakeLists.txt", "option(STATIC \"static linking\" FALSE)", "option(STATIC \"static linking\" TRUE)");
 
         context.StartProcess("cmake", new ProcessSettings { WorkingDirectory = buildWorkingDir, Arguments = "-DSAN=ON CMakeLists.txt" });
         var runtimeLibLine = "<PreprocessorDefinitions>NDEBUG;_HAS_EXCEPTIONS=0;%(PreprocessorDefinitions);BASISU_SUPPORT_SSE=1;BASISU_SUPPORT_OPENCL=1;</PreprocessorDefinitions>";
