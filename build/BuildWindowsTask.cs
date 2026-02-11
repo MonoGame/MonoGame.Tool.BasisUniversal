@@ -9,17 +9,32 @@ public sealed class BuildWindowsTask : FrostingTask<BuildContext>
 
     public override void Run(BuildContext context)
     {
-        var buildWorkingDir = "basis_universal/";
+        BuildForArchitecture(context, "x64", "windows-x64");
+        BuildForArchitecture(context, "ARM64", "windows-arm64", "-DSSE=OFF");
+    }
 
-        // needed until https://github.com/BinomialLLC/basis_universal/pull/391 gets merged
-        context.ReplaceTextInFiles("basis_universal/CMakeLists.txt", "project(basisu)", "project(basisu C CXX)\nset(CMAKE_CXX_STANDARD 17)");
-
-        context.StartProcess("cmake", new ProcessSettings { WorkingDirectory = buildWorkingDir, Arguments = "-DSAN=ON -DSTATIC=TRUE CMakeLists.txt" });
-        context.ReplaceTextInFiles("basis_universal/basisu.vcxproj", "MultiThreadedDLL", "MultiThreaded");
-        context.ReplaceTextInFiles("basis_universal/basisu_encoder.vcxproj", "MultiThreadedDLL", "MultiThreaded");
-        context.ReplaceTextInFiles("basis_universal/examples.vcxproj", "MultiThreadedDLL", "MultiThreaded");
+    private void BuildForArchitecture(BuildContext context, string cmakeArch, string rid, string cmakeOptions = "")
+    {
+        var buildWorkingDir = $"basis_universal/{rid}";
+        context.CreateDirectory(buildWorkingDir);
+        
+        context.StartProcess("cmake", new ProcessSettings { WorkingDirectory = buildWorkingDir, Arguments = $"-A {cmakeArch} {cmakeOptions} -DSAN=ON -DSTATIC=TRUE ../" });
+        context.ReplaceTextInFiles($"basis_universal/basisu.vcxproj", "MultiThreadedDLL", "MultiThreaded");
+        context.ReplaceTextInFiles($"basis_universal/basisu_encoder.vcxproj", "MultiThreadedDLL", "MultiThreaded");
+        context.ReplaceTextInFiles($"basis_universal/examples.vcxproj", "MultiThreadedDLL", "MultiThreaded");
         context.StartProcess("cmake", new ProcessSettings { WorkingDirectory = buildWorkingDir, Arguments = "--build . --config release" });
-        var files = Directory.GetFiles(System.IO.Path.Combine(buildWorkingDir, "bin"), "basisu.exe", SearchOption.TopDirectoryOnly);
-        context.CopyFile(files[0], $"{context.ArtifactsDir}/basisu.exe");
+        
+        context.CreateDirectory($"{context.ArtifactsDir}/{rid}");
+        foreach (var file in Directory.GetFiles(System.IO.Path.Combine("basis_universal"), "*.exe", SearchOption.AllDirectories))
+        {
+            context.Information($"Found {file}");
+        }
+        var files = Directory.GetFiles(System.IO.Path.Combine("basis_universal", "bin"), "basisu.exe", SearchOption.TopDirectoryOnly);
+        context.Information($"Copying {files.Length} to {context.ArtifactsDir}/{rid}");
+        foreach (var file in files)
+        {
+            context.Information($"Copying {file} to {context.ArtifactsDir}/{rid}/basisu.exe");
+        }
+        context.CopyFile(files[0], $"{context.ArtifactsDir}/{rid}/basisu.exe");
     }
 }
