@@ -25,6 +25,10 @@ public sealed class BuildWindowsTask : FrostingTask<BuildContext>
         context.StartProcess("cmake", new ProcessSettings { WorkingDirectory = buildWorkingDir, Arguments = "--build . --config release" });
         
         context.CreateDirectory($"{context.ArtifactsDir}/{rid}");
+        foreach (var file in Directory.GetFiles(System.IO.Path.Combine("basis_universal"), "basisu.exe", SearchOption.AllDirectories))
+        {
+            context.Information($"Copying {file} to {context.ArtifactsDir}/{rid}/basisu.exe");
+        }
         var files = Directory.GetFiles(System.IO.Path.Combine("basis_universal", "bin"), "basisu.exe", SearchOption.TopDirectoryOnly);
         context.CopyFile(files[0], $"{context.ArtifactsDir}/{rid}/basisu.exe");
     }
