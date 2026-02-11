@@ -25,11 +25,11 @@ public sealed class BuildWindowsTask : FrostingTask<BuildContext>
         context.ReplaceTextInFiles($"{buildWorkingDir}/basisu_encoder.vcxproj", "MultiThreadedDLL", "MultiThreaded");
         context.ReplaceTextInFiles($"{buildWorkingDir}/examples.vcxproj", "MultiThreadedDLL", "MultiThreaded");
         context.StartProcess("cmake", new ProcessSettings { WorkingDirectory = buildWorkingDir, Arguments = "--build . --config release" });
-        foreach (var file in Directory.GetFiles(buildWorkingDir, "*", SearchOption.AllDirectories))
+        foreach (var file in Directory.GetFiles(buildWorkingDir, "basisu.exe", SearchOption.AllDirectories))
         {
             context.Information($"{file}");
         }
-        var files = Directory.GetFiles(System.IO.Path.Combine(buildWorkingDir, "bin"), "basisu.exe", SearchOption.TopDirectoryOnly);
+        var files = Directory.GetFiles(System.IO.Path.Combine(buildWorkingDir, "..", "bin"), "basisu.exe", SearchOption.TopDirectoryOnly);
         context.CreateDirectory($"{context.ArtifactsDir}/{rid}");
         context.CopyFile(files[0], $"{context.ArtifactsDir}/{rid}/basisu.exe");
     }
