@@ -20,9 +20,14 @@ public sealed class BuildWindowsTask : FrostingTask<BuildContext>
         context.ReplaceTextInFiles("basis_universal/CMakeLists.txt", "project(basisu)", "project(basisu C CXX)\nset(CMAKE_CXX_STANDARD 17)");
 
         context.StartProcess("cmake", new ProcessSettings { WorkingDirectory = buildWorkingDir, Arguments = $"-DSAN=ON -A {arch} -B {buildWorkingDir} -DSTATIC=TRUE -S .." });
-        context.ReplaceTextInFiles("basis_universal/basisu.vcxproj", "MultiThreadedDLL", "MultiThreaded");
-        context.ReplaceTextInFiles("basis_universal/basisu_encoder.vcxproj", "MultiThreadedDLL", "MultiThreaded");
-        context.ReplaceTextInFiles("basis_universal/examples.vcxproj", "MultiThreadedDLL", "MultiThreaded");
+
+        foreach (var file in Directory.GetFiles(buildWorkingDir, "*", SearchOption.AllDirectories))
+        {
+            context.Information($"{file}");
+        }
+        context.ReplaceTextInFiles($"{buildWorkingDir}/basisu.vcxproj", "MultiThreadedDLL", "MultiThreaded");
+        context.ReplaceTextInFiles($"{buildWorkingDir}/basisu_encoder.vcxproj", "MultiThreadedDLL", "MultiThreaded");
+        context.ReplaceTextInFiles($"{buildWorkingDir}/examples.vcxproj", "MultiThreadedDLL", "MultiThreaded");
         context.StartProcess("cmake", new ProcessSettings { WorkingDirectory = buildWorkingDir, Arguments = "--build . --config release" });
         var files = Directory.GetFiles(System.IO.Path.Combine(buildWorkingDir, "bin"), "basisu.exe", SearchOption.TopDirectoryOnly);
         context.CreateDirectory($"{context.ArtifactsDir}/{rid}");
