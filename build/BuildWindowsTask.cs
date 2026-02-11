@@ -19,7 +19,7 @@ public sealed class BuildWindowsTask : FrostingTask<BuildContext>
         context.CreateDirectory(buildWorkingDir);
         context.ReplaceTextInFiles("basis_universal/CMakeLists.txt", "project(basisu)", "project(basisu C CXX)\nset(CMAKE_CXX_STANDARD 17)");
 
-        context.StartProcess("cmake", new ProcessSettings { WorkingDirectory = buildWorkingDir, Arguments = $"-DSAN=ON -A {arch} -B {buildWorkingDir} -DSTATIC=TRUE -S .." });
+        context.StartProcess("cmake", new ProcessSettings { WorkingDirectory = buildWorkingDir, Arguments = $"-DSAN=ON -A {arch} -DSTATIC=TRUE -S .." });
 
         foreach (var file in Directory.GetFiles(buildWorkingDir, "*", SearchOption.AllDirectories))
         {
