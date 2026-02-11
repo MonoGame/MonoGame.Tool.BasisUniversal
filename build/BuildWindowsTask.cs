@@ -10,27 +10,22 @@ public sealed class BuildWindowsTask : FrostingTask<BuildContext>
     public override void Run(BuildContext context)
     {
         BuildForArchitecture(context, "x64", "windows-x64");
-        BuildForArchitecture(context, "ARM64", "windows-arm64");
+        BuildForArchitecture(context, "ARM64", "windows-arm64", "-DSSE=OFF");
     }
 
-    private void BuildForArchitecture(BuildContext context, string arch, string rid)
+    private void BuildForArchitecture(BuildContext context, string cmakeArch, string rid, string cmakeOptions = "")
     {
-        var buildWorkingDir = $"basis_universal/{rid}";
+        var buildWorkingDir = $"basis_universal_build_{rid}/";
         context.CreateDirectory(buildWorkingDir);
-        context.ReplaceTextInFiles("basis_universal/CMakeLists.txt", "project(basisu)", "project(basisu C CXX)\nset(CMAKE_CXX_STANDARD 17)");
-
-        context.StartProcess("cmake", new ProcessSettings { WorkingDirectory = buildWorkingDir, Arguments = $"-DSAN=ON -A {arch} -DSTATIC=TRUE -S .." });
-
-        context.ReplaceTextInFiles($"{buildWorkingDir}/basisu.vcxproj", "MultiThreadedDLL", "MultiThreaded");
-        context.ReplaceTextInFiles($"{buildWorkingDir}/basisu_encoder.vcxproj", "MultiThreadedDLL", "MultiThreaded");
-        context.ReplaceTextInFiles($"{buildWorkingDir}/examples.vcxproj", "MultiThreadedDLL", "MultiThreaded");
+        
+        context.StartProcess("cmake", new ProcessSettings { WorkingDirectory = buildWorkingDir, Arguments = $"-A {cmakeArch} {cmakeOptions} -DSAN=ON -DSTATIC=TRUE ../basis_universal/CMakeLists.txt" });
+        context.ReplaceTextInFiles($"{buildWorkingDir}basisu.vcxproj", "MultiThreadedDLL", "MultiThreaded");
+        context.ReplaceTextInFiles($"{buildWorkingDir}basisu_encoder.vcxproj", "MultiThreadedDLL", "MultiThreaded");
+        context.ReplaceTextInFiles($"{buildWorkingDir}examples.vcxproj", "MultiThreadedDLL", "MultiThreaded");
         context.StartProcess("cmake", new ProcessSettings { WorkingDirectory = buildWorkingDir, Arguments = "--build . --config release" });
-        foreach (var file in Directory.GetFiles(buildWorkingDir, "basisu.exe", SearchOption.AllDirectories))
-        {
-            context.Information($"{file}");
-        }
-        var files = Directory.GetFiles(System.IO.Path.Combine(buildWorkingDir, "..", "bin"), "basisu.exe", SearchOption.TopDirectoryOnly);
+        
         context.CreateDirectory($"{context.ArtifactsDir}/{rid}");
+        var files = Directory.GetFiles(System.IO.Path.Combine("basis_universal", "bin"), "basisu.exe", SearchOption.TopDirectoryOnly);
         context.CopyFile(files[0], $"{context.ArtifactsDir}/{rid}/basisu.exe");
     }
 }
