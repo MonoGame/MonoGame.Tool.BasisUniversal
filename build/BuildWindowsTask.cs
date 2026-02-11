@@ -15,13 +15,13 @@ public sealed class BuildWindowsTask : FrostingTask<BuildContext>
 
     private void BuildForArchitecture(BuildContext context, string cmakeArch, string rid, string cmakeOptions = "")
     {
-        var buildWorkingDir = $"basis_universal_build_{rid}/";
+        var buildWorkingDir = $"basis_universal/{rid}";
         context.CreateDirectory(buildWorkingDir);
         
-        context.StartProcess("cmake", new ProcessSettings { WorkingDirectory = buildWorkingDir, Arguments = $"-A {cmakeArch} {cmakeOptions} -DSAN=ON -DSTATIC=TRUE ../basis_universal/CMakeLists.txt" });
-        context.ReplaceTextInFiles($"{buildWorkingDir}basisu.vcxproj", "MultiThreadedDLL", "MultiThreaded");
-        context.ReplaceTextInFiles($"{buildWorkingDir}basisu_encoder.vcxproj", "MultiThreadedDLL", "MultiThreaded");
-        context.ReplaceTextInFiles($"{buildWorkingDir}examples.vcxproj", "MultiThreadedDLL", "MultiThreaded");
+        context.StartProcess("cmake", new ProcessSettings { WorkingDirectory = buildWorkingDir, Arguments = $"-A {cmakeArch} {cmakeOptions} -DSAN=ON -DSTATIC=TRUE ../" });
+        context.ReplaceTextInFiles($"basis_universal/basisu.vcxproj", "MultiThreadedDLL", "MultiThreaded");
+        context.ReplaceTextInFiles($"basis_universal/basisu_encoder.vcxproj", "MultiThreadedDLL", "MultiThreaded");
+        context.ReplaceTextInFiles($"basis_universal/examples.vcxproj", "MultiThreadedDLL", "MultiThreaded");
         context.StartProcess("cmake", new ProcessSettings { WorkingDirectory = buildWorkingDir, Arguments = "--build . --config release" });
         
         context.CreateDirectory($"{context.ArtifactsDir}/{rid}");
